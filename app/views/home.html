@@ -1,0 +1,75 @@
+<h2>Available Vehicles</h2>
+<div class="container-fluid">
+	<div class="legend">
+		<p>
+			Pick up:
+		</p>
+		<p>
+			{{model.PickUpLocation}} on {{model.PickUpDateTime | dateformat}}
+		</p>
+	</div>
+	<div class="legend">
+		<p>
+			Return:
+		</p>
+		<p>
+			{{model.ReturnLocation}} on {{model.ReturnDateTime | dateformat}}
+		</p>
+	</div>
+</div>
+<div class="filter">
+	<input type="search" ng-change="filtered()" ng-model="search.MakeModel" placeholder="Search for a vehicle model" />
+	<span class="clear glyphicon glyphicon-remove-sign" ng-click="search.MakeModel=''" ng-if="search.MakeModel!=undefined&&search.MakeModel!=''"></span>
+	<ul class="sorting">
+		<li ng-repeat="item in sortOptions"
+			ng-class="{selected: orderBy.replace('-', '') == item.value, desc: orderBy[0] == '-'}"
+			ng-click="sort(item.value)">{{item.label}}</li>
+	</ul>
+</div>
+
+<ul class="vehicle-list">
+	<li ng-repeat="car in filteredCars = (cars | filter : search : strict) | orderBy : orderBy">
+	    <div class="row">
+				<div class="col-md-4">
+					<p>Rate: {{car.RateTotalAmount|currcode: car.CurrencyCode}}</p>
+					<p>Estimated: {{car.EstimatedTotalAmount|currcode: car.CurrencyCode}}</p>
+					<button ng-click="rental()" class="btn btn-primary">Book</button>
+				</div>
+				<div class="col-md-4">
+						<h5>{{car.CodeContext}} - {{car.MakeModel}}</h5>
+						<p>Your Rental Includes</p>
+						<ul class="group">
+							<li ng-if="car.AirConditionInd">Air Condition</li>
+							<li>{{car.TransmissionType}}</li>
+							<li>{{car.FuelType}}</li>
+						</ul>
+						<p>Vehicle Features</p>
+						<div class="row">
+							<div class="col-md-2">
+								<img class="iconimage" src="assets/images/passenger.svg"></img>
+								<p ng-if="car.PassengerQuantity!=undefined">x{{car.PassengerQuantity}}</p>
+							</div>
+							<div class="col-md-2">
+								<img class="iconimage" src="assets/images/baggage.svg"></img>
+								<p ng-if="car.BaggageQuantity!=undefined">x{{car.BaggageQuantity}}</p>
+							</div>
+						</div>
+						<ul class="group">
+							<li>Door count:</li>
+							<li ng-repeat="dcount in doorcount" ng-class="dcount == car.DoorCount?'selected':'select'">
+ 								{{dcount}}
+							</li>
+						</ul>
+				</div>
+				<div class="col-md-4">
+						<img ng-src="{{car.PictureURL}}" class="picture"></img>
+				</div>
+			</div>
+	</li>
+	<div style="width:80%;">
+			<div class="loader" ng-show="isLoading" >
+				Loading
+			</div>
+	<div>
+</ul>
+<p ng-hide="filteredCars.length || isLoading" class="no-result">No results for "{{search.MakeModel}}"</p>
